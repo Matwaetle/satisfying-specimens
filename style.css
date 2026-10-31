@@ -1,0 +1,52 @@
+:root{
+  --ink:#0e0d0b; --bone:#e8e2d6; --dim:rgba(232,226,214,.56); --hair:rgba(232,226,214,.16);
+  --serif:'Fraunces','Noto Serif KR',serif; --kr:'Noto Serif KR',serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--ink);color:var(--bone);overscroll-behavior:none}
+body{font-family:var(--kr);font-weight:300;-webkit-font-smoothing:antialiased}
+body.in-toy{overflow:hidden;position:fixed;inset:0;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#stage{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;transition:filter .7s cubic-bezier(.2,.7,.2,1),opacity .35s}
+#stage.unfocused{filter:blur(22px) brightness(.35);transition:filter .22s ease-in}
+body:not(.in-toy) #stage{pointer-events:none}
+#scrim{position:fixed;inset:0;pointer-events:none;background:rgba(14,13,11,.5);transition:opacity .5s}
+body.in-toy #scrim{opacity:0}
+
+#index{position:relative;min-height:100dvh;display:flex;flex-direction:column;padding:clamp(24px,5vw,64px);padding-top:max(clamp(24px,5vw,64px),env(safe-area-inset-top))}
+#index[hidden],#shell[hidden],#nogl[hidden]{display:none}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:clamp(20px,5vh,56px)}
+h1{font-weight:300;font-size:clamp(20px,2.2vw,28px);letter-spacing:-.01em}
+.sub{font-family:var(--serif);font-style:italic;color:var(--dim);font-size:clamp(14px,1.3vw,17px)}
+#list{list-style:none;padding:0;flex:1;display:flex;flex-direction:column;justify-content:center}
+#list li{border-top:1px solid var(--hair)}
+#list li:last-child{border-bottom:1px solid var(--hair)}
+#list a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:clamp(11px,1.9vh,20px) 0;color:inherit;text-decoration:none;transition:padding .35s cubic-bezier(.2,.7,.2,1),opacity .25s}
+#list .no{font:400 12px var(--mono);color:var(--dim)}
+#list .name{font-size:clamp(26px,5vw,62px);line-height:1.12;letter-spacing:-.025em}
+#list .latin{font-family:var(--serif);font-style:italic;font-size:.5em;color:var(--dim);margin-left:.5em;letter-spacing:0;white-space:nowrap}
+#list .verb{font:400 12px var(--mono);color:var(--dim);text-align:right}
+#list.has-active a{opacity:.32}
+#list a.active,#list a:focus-visible{opacity:1;padding-left:14px;outline:none}
+footer{margin-top:clamp(18px,4vh,40px);font:400 12px/1.6 var(--mono);color:var(--dim)}
+@media (max-width:640px){
+  #list a{grid-template-columns:2.4em minmax(0,1fr)}
+  #list .verb{display:none}
+  #list .latin{display:block;margin:2px 0 0;font-size:.48em}
+  #list .name{font-size:27px}
+}
+
+#shell{position:fixed;inset:0;pointer-events:none;font-family:var(--mono);font-size:12px;color:var(--bone);text-shadow:0 0 3px rgba(0,0,0,.9),0 1px 10px rgba(0,0,0,.8);z-index:3}
+#back,#actions button,#tools button{pointer-events:auto;background:none;border:0;color:inherit;font:inherit;text-shadow:inherit;cursor:pointer;text-decoration:none;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
+#back{position:absolute;left:max(10px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));font-size:20px}
+#caption{position:absolute;left:62px;top:max(22px,calc(env(safe-area-inset-top) + 14px));opacity:.82;right:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#actions{position:absolute;right:max(10px,env(safe-area-inset-right));top:max(8px,env(safe-area-inset-top));display:flex;gap:4px}
+#actions button{padding:0 10px}
+#tools{position:absolute;left:0;right:0;bottom:max(12px,env(safe-area-inset-bottom));display:flex;justify-content:center;gap:6px}
+#tools button{padding:0 14px;opacity:.55;border-bottom:1px solid transparent;transition:opacity .2s}
+#tools button.on{opacity:1;border-bottom-color:currentColor}
+#hint{position:absolute;left:16px;right:16px;bottom:max(70px,calc(env(safe-area-inset-bottom) + 66px));text-align:center;font:300 15px var(--kr);opacity:0;transition:opacity .6s}
+#hint.show{opacity:.92}
+button:focus-visible,#back:focus-visible{outline:1px solid var(--bone);outline-offset:-6px}
+#nogl{position:fixed;inset:0;display:grid;place-items:center;padding:32px;text-align:center;z-index:9}
+@media (max-width:640px){#caption{display:none}}
+@media (prefers-reduced-motion:reduce){#stage,#stage.unfocused,#list a{transition:none}}

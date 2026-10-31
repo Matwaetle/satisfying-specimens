@@ -13,8 +13,13 @@ void main(){ vec2 p=(v-.5)*asp;
   // Pour-in: new sand arrives irregularly.
   float gate=smoothstep(0.,.14,grow-fbm(p*6.+seed*3.)*1.05);
   vec4 cur=texture(h,v); o=mix(cur,vec4(c*H,H),gate); }`;
-const PUSH = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; uniform vec2 asp,c,dir; uniform float W,ds;
+const PUSH = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; uniform vec2 asp,c,dir,c0,dir0; uniform float W,ds;
+float side_(vec2 a,vec2 b,vec2 p){ return (b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x); }
+bool inTri(vec2 p,vec2 a,vec2 b,vec2 c){ float d0=side_(a,b,p),d1=side_(b,c,p),d2=side_(c,a,p); return !((d0<0.||d1<0.||d2<0.)&&(d0>0.||d1>0.||d2>0.)); }
+// Everything the lip actually crossed this step, whatever its angle or speed.
+bool swept(vec2 p,vec2 c0,vec2 n0,vec2 c1,vec2 n1,float w){ vec2 a=c0-n0*w,b=c0+n0*w,d=c1+n1*w,e=c1-n1*w; return inTri(p,a,b,d)||inTri(p,a,d,e); }
 void main(){ vec2 p=(v-.5)*asp; vec2 n=vec2(-dir.y,dir.x); vec2 rel=p-c; float s=dot(rel,n),f=dot(rel,dir);
+  if(swept(p,c0,vec2(-dir0.y,dir0.x),c,n,W)){ o=vec4(0.); return; }
   vec4 cur=texture(h,v);
   float inW=smoothstep(W,W*.88,abs(s));
   if(inW<=0.){ o=cur; return; }
@@ -29,7 +34,11 @@ const RELAX = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; uniform ve
 void main(){ vec4 c=texture(h,v); float lim=1.05*tx.x*asp.x; vec4 d=vec4(0.);
   for(int i=0;i<4;i++){ vec2 e=i==0?vec2(tx.x,0.):i==1?vec2(-tx.x,0.):i==2?vec2(0.,tx.y):vec2(0.,-tx.y); vec4 n=texture(h,v+e);
     float diff=n.a-c.a; if(diff>lim){ d+=n*min((diff-lim)/max(n.a,1e-5),1.)*.11; } else if(diff<-lim){ d-=c*min((-diff-lim)/max(c.a,1e-5),1.)*.11; } }
-  o=max(c+d,vec4(0.)); }`;
+  // Stray specks with nothing around them blow away instead of beading into patterns.
+  vec4 r=max(c+d,vec4(0.));
+  float low=min(min(texture(h,v+vec2(tx.x*3.,0.)).a,texture(h,v-vec2(tx.x*3.,0.)).a),min(texture(h,v+vec2(0.,tx.y*3.)).a,texture(h,v-vec2(0.,tx.y*3.)).a));
+  if(r.a<.006&&low<.0006) r*=.8;
+  o=r; }`;
 const CHECK = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; void main(){ float a=0.; for(int y=0;y<3;y++)for(int x=0;x<3;x++) a=max(a,texture(h,v+(vec2(x,y)-1.)*.01).a); o=vec4(a*300.,0.,0.,1.); }`;
 const FADE = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; uniform float k; void main(){ vec4 c=texture(h,v); o=c*(c.a<.002?k:1.); }`;
 
@@ -129,11 +138,12 @@ export function create(env) {
       const tt = 1 - Math.exp(-dt * 6 / steps);
       for (let i = 0; i < steps; i++) {
         // Turn a little on every step: turning between frames would leave a fan of ridges.
+        const c0 = [blade.x, blade.y], dir0 = [blade.dx, blade.dy];
         blade.dx += (dx / d - blade.dx) * tt; blade.dy += (dy / d - blade.dy) * tt;
         const l = Math.hypot(blade.dx, blade.dy) || 1; blade.dx /= l; blade.dy /= l;
         blade.x += dx / d * ds; blade.y += dy / d * ds;
         const along = (dx * blade.dx + dy * blade.dy) / d;
-        kit.draw(pP, { h: sim.read, asp, c: [blade.x, blade.y], dir: [blade.dx, blade.dy], W: bw(), ds: ds * along }, sim.write); sim.swap();
+        kit.draw(pP, { h: sim.read, asp, c: [blade.x, blade.y], dir: [blade.dx, blade.dy], c0, dir0, W: bw(), ds: ds * along }, sim.write); sim.swap();
       }
       relaxN = 22;
     }

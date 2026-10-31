@@ -104,7 +104,7 @@ export function create(env) {
     up(p) { pts.delete(p.id); },
   });
   return {
-    resize(w, h) { W = w; H = h; build(); },
+    resize(w, h) { const changed = !pieces.length || Math.abs(w / h - W / H) > .01; W = w; H = h; if (changed) build(); },
     reset() { build(); },
     attract(_, dt) { autoT += dt; if (autoT > .32) { autoT = 0; const c = pieces.filter(b => !b.gone); if (c.length) { c[Math.floor(Math.random() * c.length)].target = 1; } } },
     frame(t, dt) {

@@ -8,9 +8,14 @@ void main(){ vec2 p=(v-.5)*asp; float f=fbm(p*3.+seed); float th=.72+.5*f;
   // Roll on from the top with a soft wandering edge.
   float g=smoothstep(0.,.05,cover-(1.-v.y)-(fbm(p*5.+seed)-.5)*.14);
   vec4 c=texture(h,v); o=mix(c,vec4(th,.6,1.,1.),g); }`;
-const WIPE = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; uniform vec2 asp,c,dir; uniform float W,ds;
+const WIPE = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; uniform vec2 asp,c,dir,c0,dir0; uniform float W,ds;
+float side_(vec2 a,vec2 b,vec2 p){ return (b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x); }
+bool inTri(vec2 p,vec2 a,vec2 b,vec2 c){ float d0=side_(a,b,p),d1=side_(b,c,p),d2=side_(c,a,p); return !((d0<0.||d1<0.||d2<0.)&&(d0>0.||d1>0.||d2>0.)); }
+// Everything the lip actually crossed this step, whatever its angle or speed.
+bool swept(vec2 p,vec2 c0,vec2 n0,vec2 c1,vec2 n1,float w){ vec2 a=c0-n0*w,b=c0+n0*w,d=c1+n1*w,e=c1-n1*w; return inTri(p,a,b,d)||inTri(p,a,d,e); }
 void main(){ vec2 p=(v-.5)*asp; vec2 n=vec2(-dir.y,dir.x); vec2 rel=p-c; float s=dot(rel,n),f=dot(rel,dir);
-  vec4 cur=texture(h,v); float inW=smoothstep(W,W*.985,abs(s));
+  vec4 cur=texture(h,v);
+  if(swept(p,c0,vec2(-dir0.y,dir0.x),c,n,W)){ o=vec4(0.,0.,0.,cur.a); return; } float inW=smoothstep(W,W*.985,abs(s));
   if(inW<=0.){ o=cur; return; }
   // Rubber lip: whatever it passes is gone, and foam bunches up against it.
   if(f<=0.&&f>-ds-.014){ vec4 k=cur; k.r*=1.-inW; k.g*=1.-inW; k.b*=1.-inW; o=k; return; }
@@ -21,7 +26,7 @@ void main(){ vec2 p=(v-.5)*asp; vec2 n=vec2(-dir.y,dir.x); vec2 rel=p-c; float s
 const DRIP = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; uniform vec2 asp; uniform vec3 d[24]; uniform float dt;
 void main(){ vec2 p=(v-.5)*asp; vec4 c=texture(h,v);
   // Foam slowly sags; thin water evaporates back to clear.
-  vec4 up=texture(h,v+vec2(0.,.0016)); c.r=mix(c.r,max(c.r,up.r*.992),.05); c.g*=exp(-dt*.5);
+  vec4 up=texture(h,v+vec2(0.,.0016)); if(c.r>.08) c.r=mix(c.r,max(c.r,up.r*.992),.05); c.g*=exp(-dt*.5);
   for(int i=0;i<24;i++){ if(d[i].z<=0.) continue; vec2 q=(p-d[i].xy)/vec2(d[i].z,d[i].z*1.5); float m=smoothstep(1.,.5,length(q)); c.r*=1.-m; c.g=max(c.g,m*.5); }
   o=c; }`;
 const CHECK = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; void main(){ float a=0.; for(int y=0;y<3;y++)for(int x=0;x<3;x++) a=max(a,texture(h,v+(vec2(x,y)-1.)*.012).r); o=vec4(a,0.,0.,1.); }`;
@@ -96,12 +101,13 @@ export function create(env) {
     const dx = blade.tx - blade.x, dy = blade.ty - blade.y, d = Math.hypot(dx, dy), k = 1 - Math.exp(-dt * 30), mv = d * k;
     if (blade.fresh) { if (d < .012) return 0; blade.dx = dx / d; blade.dy = dy / d; blade.fresh = false; }
     if (d > 1e-4) {
-      const tt = 1 - Math.exp(-dt * 13); blade.dx += (dx / d - blade.dx) * tt; blade.dy += (dy / d - blade.dy) * tt;
-      const l = Math.hypot(blade.dx, blade.dy) || 1; blade.dx /= l; blade.dy /= l;
-      const steps = Math.min(6, Math.ceil(mv / .012)), ds = mv / Math.max(steps, 1);
+      const steps = Math.min(6, Math.ceil(mv / .012)), ds = mv / Math.max(steps, 1), tt = 1 - Math.exp(-dt * 13 / Math.max(steps, 1));
       for (let i = 0; i < steps; i++) {
+        const c0 = [blade.x, blade.y], dir0 = [blade.dx, blade.dy];
+        blade.dx += (dx / d - blade.dx) * tt; blade.dy += (dy / d - blade.dy) * tt;
+        const l = Math.hypot(blade.dx, blade.dy) || 1; blade.dx /= l; blade.dy /= l;
         blade.x += dx / d * ds; blade.y += dy / d * ds;
-        kit.draw(p.wipe, { h: sim.read, asp, c: [blade.x, blade.y], dir: [blade.dx, blade.dy], W: bw(), ds }, sim.write); sim.swap();
+        kit.draw(p.wipe, { h: sim.read, asp, c: [blade.x, blade.y], dir: [blade.dx, blade.dy], c0, dir0, W: bw(), ds }, sim.write); sim.swap();
       }
     }
     return mv / Math.max(dt, .001);

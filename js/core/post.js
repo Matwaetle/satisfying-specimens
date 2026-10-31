@@ -35,16 +35,19 @@ export class Post {
     this.time = 0;
   }
   resize(w, h, levels = 5) {
-    if (this.mark !== undefined) this.kit.release(this.mark);
-    this.mark = this.kit.mark();
+    // The lens chain outlives specimens, so it stays out of the kit's tracked list.
+    const gl = this.kit.gl;
+    for (const r of this.own || []) { gl.deleteFramebuffer(r.fb); gl.deleteTexture(r.tex); }
+    this.own = [];
+    const make = (a, b) => { const r = this.kit.fbo(a, b, 'rgba16f'); this.kit.owned.pop(); this.own.push(r); return r; };
     this.w = w; this.h = h;
-    this.hdr = this.kit.fbo(w, h, 'rgba16f');
+    this.hdr = make(w, h);
     this.chain = []; this.upChain = [];
     let cw = w, ch = h;
     for (let i = 0; i < levels; i++) {
       cw = Math.max(2, cw >> 1); ch = Math.max(2, ch >> 1);
-      this.chain.push(this.kit.fbo(cw, ch, 'rgba16f'));
-      this.upChain.push(this.kit.fbo(cw, ch, 'rgba16f'));
+      this.chain.push(make(cw, ch));
+      this.upChain.push(make(cw, ch));
     }
   }
   begin() {

@@ -194,7 +194,7 @@ export function create(env) {
 
   build.done = false;
   const inst = {
-    resize(w, h) { const changed = Math.abs(w / h - W / H) > .01 || !tex; W = w; H = h; if (changed) build(); },
+    resize(w, h) { const changed = Math.abs(w / h - W / H) > .01 || !tex; cell *= w / W; W = w; H = h; if (changed) build(); },
     reset() { sheet++; phase = 'slide'; phaseT = 0; rust && bus.play(rust, { gain: .55 }); },
     attract(t) {
       const x = .5 + .42 * Math.sin(t * .9), y = .5 + .34 * Math.sin(t * 1.3 + 1);

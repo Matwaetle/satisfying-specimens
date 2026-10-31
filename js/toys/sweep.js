@@ -20,7 +20,8 @@ void main(){ vec2 p=(v-.5)*asp; vec2 n=vec2(-dir.y,dir.x); vec2 rel=p-c; float s
   if(inW<=0.){ o=cur; return; }
   const float R=.05;
   // Strip just passed by the blade is scraped bare; its load lands ahead of the blade.
-  if(f<=0.&&f>-ds-.003){ o=cur*(1.-inW); return; }
+  // The band is wider than the strip so that pile slumping back past the lip is caught too.
+  if(f<=0.&&f>-ds-.02){ o=cur*(1.-inW); return; }
   if(f>0.&&f<R){ vec4 m=vec4(0.); for(int i=0;i<4;i++){ vec2 q=p-dir*(f+ds*(float(i)+.5)/4.); m+=texture(h,q/asp+.5); } m*=.25;
     float wg=2./R*(1.-f/R); o=cur+m*inW*ds*wg; return; }
   o=cur; }`;

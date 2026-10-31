@@ -13,7 +13,7 @@ void main(){ vec2 p=(v-.5)*asp; vec2 n=vec2(-dir.y,dir.x); vec2 rel=p-c; float s
   vec4 cur=texture(h,v); float inW=smoothstep(W,W*.985,abs(s));
   if(inW<=0.){ o=cur; return; }
   // Rubber lip: whatever it passes is gone, and foam bunches up against it.
-  if(f<=0.&&f>-ds-.004){ vec4 k=cur; k.r*=1.-inW; k.g*=1.-inW; k.b*=1.-inW; o=k; return; }
+  if(f<=0.&&f>-ds-.014){ vec4 k=cur; k.r*=1.-inW; k.g*=1.-inW; k.b*=1.-inW; o=k; return; }
   const float R=.035;
   if(f>0.&&f<R){ float m=0.; for(int i=0;i<3;i++){ vec2 q=p-dir*(f+ds*(float(i)+.5)/3.); m+=texture(h,q/asp+.5).r; } m/=3.;
     o=cur+vec4(m*inW*ds*(2./R)*(1.-f/R),.1*inW,0.,0.); return; }

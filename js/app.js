@@ -6,10 +6,15 @@ import { AudioEngine } from './core/audio.js';
 
 export const SPECIMENS = [
   { id: 'bubble', name: '뽁뽁이', latin: 'Bubble film', verb: '터뜨리기', caption: 'No.01 — 저밀도 폴리에틸렌, 기포 10mm', hint: '누르거나, 쭉 그어보세요' },
-  { id: 'sand', name: '모래 정원', latin: 'Karesansui', verb: '고르기', caption: 'No.02 — 화강암 모래, 저녁 햇빛', hint: '천천히 그어보세요' },
-  { id: 'marble', name: '마블링', latin: 'Ebru', verb: '섞기', caption: 'No.03 — 수면 위의 안료', hint: '톡 떨어뜨리고, 끌어서 흐트러뜨리세요' },
-  { id: 'ferro', name: '페로플루이드', latin: 'Ferrofluid', verb: '끌어올리기', caption: 'No.04 — 기름 속의 Fe₃O₄, 자기장', hint: '가까이 가져가고, 꾹 눌러보세요' },
-  { id: 'pendulum', name: '펜듈럼 종', latin: 'Pendulum wave', verb: '맞물리기', caption: 'No.05 — 크롬강 16구, D 음계', hint: '끌어당겼다 놓아보세요' },
+  { id: 'glass', name: '강화유리', latin: 'Tempered glass', verb: '와르르', caption: 'No.02 — 강화유리 8mm, 잔류 응력', hint: '유리를 꾹 누르고 버텨보세요' },
+  { id: 'ice', name: '얼음 호수', latin: 'Lake ice', verb: '내리치기', caption: 'No.03 — 호수 얼음 40cm', hint: '내리쳐보세요, 여러 번' },
+  { id: 'chocolate', name: '초콜릿', latin: 'Couverture', verb: '쪼개기', caption: 'No.04 — 카카오 70%, 녹은 속', hint: '한 칸씩 누르거나 쭉 그어보세요' },
+  { id: 'sweep', name: '싹 밀기', latin: 'Sweep', verb: '밀어내기', caption: 'No.05 — 색모래, 흑요석 바닥', hint: '끝까지 쭉 밀어보세요' },
+  { id: 'slice', name: '모래 블록', latin: 'Kinetic sand', verb: '썰기', caption: 'No.06 — 키네틱 샌드, 다섯 겹', hint: '블록 위에서 아래로 그어 썰어보세요' },
+  { id: 'squeegee', name: '스퀴지', latin: 'Squeegee', verb: '닦아내기', caption: 'No.07 — 비누 거품과 고무날', hint: '쭉 닦아서 밤을 드러내보세요' },
+  { id: 'marble', name: '마블링', latin: 'Ebru', verb: '섞기', caption: 'No.08 — 수면 위의 안료', hint: '톡 떨어뜨리고, 끌어서 흐트러뜨리세요' },
+  { id: 'ferro', name: '페로플루이드', latin: 'Ferrofluid', verb: '끌어올리기', caption: 'No.09 — 기름 속의 Fe₃O₄, 자기장', hint: '가까이 가져가고, 꾹 눌러보세요' },
+  { id: 'pendulum', name: '펜듈럼 종', latin: 'Pendulum wave', verb: '맞물리기', caption: 'No.10 — 크롬강 16구, D 음계', hint: '끌어당겼다 놓아보세요' },
 ];
 
 const $ = id => document.getElementById(id);

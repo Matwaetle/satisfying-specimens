@@ -238,3 +238,94 @@ export function roomIR(sr, { rt = 1.4, pre = .012, seed = 7 } = {}) {
   for (let i = 0; i < n; i++) { L[i] *= k; R[i] *= k; }
   return [L, R];
 }
+
+// --- Breaking and pushing ---------------------------------------------------
+
+// Thousands of tempered-glass dice raining down, then settling into a heap.
+export function glassRain(sr, seed = 1, dur = 2.8) {
+  const r = rng(seed), n = Math.floor(sr * dur), x = new Float32Array(n);
+  for (let k = 0; k < 5200; k++) {
+    const u = Math.pow(r(), 1.5), t = u * (dur - .12), env = Math.min(1, t / .12) * Math.exp(-t * 1.25);
+    const size = Math.pow(r(), 2.2), fc = 1900 + (1 - size) * 5200 + r() * 700, T = sr * (.0005 + size * .0035);
+    const at = Math.floor(t * sr), amp = env * (.12 + size * .6) * r(); let p = r() * 6;
+    for (let i = 0; i < T * 5 && at + i < n; i++) { p += TAU * fc / sr; x[at + i] += Math.sin(p) * amp * Math.exp(-i / T); }
+  }
+  return fadeEdges(normalize(x, .85), sr, 2, 60);
+}
+
+// Pane letting go: a hard crack, dense crazing, a chest-level thump.
+export function paneBreak(sr, seed = 1) {
+  const r = rng(seed), x = new Float32Array(Math.floor(sr * 1.1));
+  mixInto(x, rustle(sr, { dur: .34, density: 5200, seed }), 0, .9);
+  mixInto(x, ceramic(sr, 760, { hard: 1, dur: .5, ring: .35, seed: seed + 1, peak: 1 }), 0, .8);
+  mixInto(x, ceramic(sr, 1620, { hard: 1, dur: .3, ring: .2, seed: seed + 2, peak: 1 }), Math.floor(sr * .006), .5);
+  let ph = 0;
+  for (let i = 0; i < sr * .4; i++) { const t = i / sr; ph += TAU * (46 + 80 * Math.exp(-t * 26)) / sr; const e = Math.exp(-t * 11); x[i] += (Math.sin(ph) + .55 * Math.sin(2 * ph) + .4 * Math.sin(3 * ph) + .22 * Math.sin(5 * ph)) * e * .75; }
+  return fadeEdges(normalize(x, .95), sr, .05, 30);
+}
+
+// Lake ice: a shock wave disperses through the sheet, so highs arrive first and it sings downward.
+export function iceBoom(sr, seed = 1, { power = 1 } = {}) {
+  const r = rng(seed), dur = .9 + power * .9, n = Math.floor(sr * dur), x = new Float32Array(n);
+  const paths = 3 + Math.floor(power * 3);
+  for (let k = 0; k < paths; k++) {
+    const start = k * (.012 + r() * .05), f0 = 4300 + r() * 2200, f1 = 170 + r() * 150, span = .34 + r() * .34 + power * .18, a = .8 / (1 + k * .45);
+    let ph = r() * 6; const s0 = Math.floor(start * sr);
+    for (let i = 0; i < span * sr * 1.4 && s0 + i < n; i++) {
+      const u = i / (span * sr), f = f1 + (f0 - f1) * Math.pow(Math.max(0, 1 - u), 3.1);
+      ph += TAU * f / sr;
+      const e = Math.min(1, i / (sr * .0015)) * Math.exp(-u * 3.1);
+      x[s0 + i] += (Math.sin(ph) + .28 * Math.sin(2.02 * ph)) * e * a;
+    }
+  }
+  let ph = 0;
+  for (let i = 0; i < sr * .6 && i < n; i++) { const t = i / sr; ph += TAU * (58 + 42 * Math.exp(-t * 22)) / sr; const e = Math.exp(-t * (7 - power * 2)); x[i] += (Math.sin(ph) + .5 * Math.sin(2 * ph) + .36 * Math.sin(3 * ph) + .2 * Math.sin(5 * ph)) * e * (.55 + power * .4); }
+  mixInto(x, tick(sr, 2600 + r() * 1800, seed + 8), 0, .55);
+  return fadeEdges(normalize(x, .92), sr, .05, 40);
+}
+
+// Thick chocolate snapping: dry brittle click, short woody body.
+export function chocSnap(sr, seed = 1, { size = 1 } = {}) {
+  const r = rng(seed), f0 = (1050 + r() * 650) / size;
+  const modes = [[1, 1, .05], [1.83 + r() * .2, .7, .036], [2.9 + r() * .3, .5, .024], [4.4 + r() * .4, .3, .014]].map(([q, a, t]) => ({ f: f0 * q, a, t60: t * size }));
+  const x = new Float32Array(Math.floor(sr * .22));
+  mixInto(x, modal(sr, modes, { dur: .16, contact: 1.5, contactMs: .55, contactFc: 11000, seed, peak: 1 }), 0, 1);
+  let ph = 0;
+  for (let i = 0; i < sr * .08; i++) { const t = i / sr; ph += TAU * (205 / size) / sr; x[i] += (Math.sin(ph) + .5 * Math.sin(2 * ph) + .35 * Math.sin(3 * ph)) * .4 * Math.exp(-t * 62); }
+  mixInto(x, rustle(sr, { dur: .1, density: 1100, seed: seed + 3 }), Math.floor(sr * .004), .12);
+  return fadeEdges(normalize(x, .95), sr, .03, 10);
+}
+
+// Sand slump: soft low whump with a burst of grains that dies away.
+export function slump(sr, seed = 1, { size = 1 } = {}) {
+  const r = rng(seed), dur = .55 + size * .4, n = Math.floor(sr * dur), x = new Float32Array(n);
+  let ph = 0;
+  for (let i = 0; i < sr * .22; i++) { const t = i / sr; ph += TAU * (95 / Math.sqrt(size)) * (1 + .6 * Math.exp(-t * 34)) / sr; x[i] += (Math.sin(ph) + .55 * Math.sin(2 * ph) + .4 * Math.sin(3 * ph) + .22 * Math.sin(5 * ph)) * Math.exp(-t * 19) * .8; }
+  let y = 0;
+  for (let i = 0; i < n; i++) { const t = i / n; y = y * .96 + (r() * 2 - 1) * .08; x[i] += y * Math.exp(-t * 6) * .9; }
+  for (let k = 0; k < 2600 * dur; k++) {
+    const u = Math.pow(r(), 1.8), at = Math.floor(u * n), amp = Math.exp(-u * 5) * Math.pow(r(), 2) * .55, fc = 1500 + r() * 6000, T = sr * (.00018 + r() * .0007); let p = r() * 6;
+    for (let i = 0; i < T * 5 && at + i < n; i++) { p += TAU * fc / sr; x[at + i] += Math.sin(p) * amp * Math.exp(-i / T); }
+  }
+  return fadeEdges(normalize(x, .92), sr, .1, 30);
+}
+
+// Rubber on wet glass: stick-slip impulses ringing the blade. Pitch follows playback rate.
+export function squeakLoop(sr, seed = 2, dur = 2, rate = 240) {
+  const r = rng(seed), n = Math.floor(sr * dur), x = new Float32Array(n), period = sr / (Math.round(rate * dur) / dur);
+  const modes = [[1850, .62, .0022], [3050, .42, .0014], [5200, .16, .0007]];
+  for (let k = 0; k * period < n; k++) {
+    const at = Math.floor(k * period), amp = .55 + .45 * r();
+    for (const [f, a, tau] of modes) { const T = sr * tau, w = TAU * f / sr; for (let i = 0; i < T * 6; i++) x[(at + i) % n] += Math.sin(w * i) * Math.exp(-i / T) * a * amp; }
+  }
+  let m = 0; for (let i = 0; i < n; i++) m += x[i]; m /= n;
+  for (let i = 0; i < n; i++) x[i] -= m;
+  return normalize(x, .8);
+}
+
+// Bright, soft two-note confirmation when a surface comes up perfectly clean.
+export function gleam(sr, seed = 1) {
+  const x = new Float32Array(Math.floor(sr * 3));
+  [[587.33, 0, 1], [880, .09, .8], [1174.66, .19, .55], [1760, .3, .3]].forEach(([f, d, g], i) => mixInto(x, bell(sr, f, { seed: seed + i, dur: 2.5, t: 2 }), Math.floor(d * sr), g));
+  return fadeEdges(normalize(x, .8), sr, .2, 40);
+}

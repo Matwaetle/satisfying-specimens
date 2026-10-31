@@ -20,9 +20,9 @@ h1{font-weight:300;font-size:clamp(20px,2.2vw,28px);letter-spacing:-.01em}
 #list{list-style:none;padding:0;flex:1;display:flex;flex-direction:column;justify-content:center}
 #list li{border-top:1px solid var(--hair)}
 #list li:last-child{border-bottom:1px solid var(--hair)}
-#list a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:clamp(11px,1.9vh,20px) 0;color:inherit;text-decoration:none;transition:padding .35s cubic-bezier(.2,.7,.2,1),opacity .25s}
+#list a{display:grid;grid-template-columns:3.2em minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:clamp(6px,1.1vh,14px) 0;color:inherit;text-decoration:none;transition:padding .35s cubic-bezier(.2,.7,.2,1),opacity .25s}
 #list .no{font:400 12px var(--mono);color:var(--dim)}
-#list .name{font-size:clamp(26px,5vw,62px);line-height:1.12;letter-spacing:-.025em}
+#list .name{font-size:clamp(22px,min(4.4vw,5.2vh),54px);line-height:1.12;letter-spacing:-.025em}
 #list .latin{font-family:var(--serif);font-style:italic;font-size:.5em;color:var(--dim);margin-left:.5em;letter-spacing:0;white-space:nowrap}
 #list .verb{font:400 12px var(--mono);color:var(--dim);text-align:right}
 #list.has-active a{opacity:.32}
@@ -32,7 +32,7 @@ footer{margin-top:clamp(18px,4vh,40px);font:400 12px/1.6 var(--mono);color:var(-
   #list a{grid-template-columns:2.4em minmax(0,1fr)}
   #list .verb{display:none}
   #list .latin{display:block;margin:2px 0 0;font-size:.48em}
-  #list .name{font-size:27px}
+  #list .name{font-size:clamp(20px,3vh,27px)}
 }
 
 #shell{position:fixed;inset:0;pointer-events:none;font-family:var(--mono);font-size:12px;color:var(--bone);text-shadow:0 0 3px rgba(0,0,0,.9),0 1px 10px rgba(0,0,0,.8);z-index:3}

@@ -27,6 +27,7 @@ const items = {
   'rustle': S.rustle(sr, { seed: 2 }), 'ceramic clack': S.ceramic(sr, 700, { hard: .7, dur: .6, ring: .5, seed: 2 }),
   'tick': S.tick(sr, 2400, 3), 'shatter': S.shatter(sr, 5), 'bowl': S.ceramic(sr, 440, { hard: .55, dur: 4.5, ring: 3.6, seed: 120 }),
   'bell low': S.bell(sr, S.dScale(1, 293.66), { seed: 2 }), 'bell top': S.bell(sr, S.dScale(16, 293.66), { seed: 3 }),
+  'glass rain': S.glassRain(sr, 2), 'pane break': S.paneBreak(sr, 2), 'ice hit': S.iceBoom(sr, 2, { power: .4 }), 'ice big': S.iceBoom(sr, 3, { power: 1.3 }), 'choc snap': S.chocSnap(sr, 2), 'slump': S.slump(sr, 2), 'squeak (loop)': S.squeakLoop(sr), 'gleam': S.gleam(sr, 2),
   'water drop': S.waterDrop(sr, 3), 'gloop': S.gloop(sr, 4), 'wet tick': S.wetTick(sr, 4),
   'sand grains (loop)': S.sandGrains(sr, 1), 'brown (loop)': S.brownLoop(sr), 'water (loop)': S.waterLoop(sr), 'drone (loop)': S.drone(sr),
 };

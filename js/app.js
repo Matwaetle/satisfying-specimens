@@ -6,11 +6,10 @@ import { AudioEngine } from './core/audio.js';
 
 export const SPECIMENS = [
   { id: 'bubble', name: '뽁뽁이', latin: 'Bubble film', verb: '터뜨리기', caption: 'No.01 — 저밀도 폴리에틸렌, 기포 10mm', hint: '누르거나, 쭉 그어보세요' },
-  { id: 'kintsugi', name: '금빛 수선', latin: 'Kintsugi', verb: '깨고 잇기', caption: 'No.02 — 청자 유약, 옻과 순금', hint: '접시를 꾹 눌러 깨보세요' },
-  { id: 'sand', name: '모래 정원', latin: 'Karesansui', verb: '고르기', caption: 'No.03 — 화강암 모래, 저녁 햇빛', hint: '천천히 그어보세요' },
-  { id: 'marble', name: '마블링', latin: 'Ebru', verb: '섞기', caption: 'No.04 — 수면 위의 안료', hint: '톡 떨어뜨리고, 끌어서 흐트러뜨리세요' },
-  { id: 'ferro', name: '페로플루이드', latin: 'Ferrofluid', verb: '끌어올리기', caption: 'No.05 — 기름 속의 Fe₃O₄, 자기장', hint: '가까이 가져가고, 꾹 눌러보세요' },
-  { id: 'pendulum', name: '펜듈럼 종', latin: 'Pendulum wave', verb: '맞물리기', caption: 'No.06 — 크롬강 16구, D 음계', hint: '끌어당겼다 놓아보세요' },
+  { id: 'sand', name: '모래 정원', latin: 'Karesansui', verb: '고르기', caption: 'No.02 — 화강암 모래, 저녁 햇빛', hint: '천천히 그어보세요' },
+  { id: 'marble', name: '마블링', latin: 'Ebru', verb: '섞기', caption: 'No.03 — 수면 위의 안료', hint: '톡 떨어뜨리고, 끌어서 흐트러뜨리세요' },
+  { id: 'ferro', name: '페로플루이드', latin: 'Ferrofluid', verb: '끌어올리기', caption: 'No.04 — 기름 속의 Fe₃O₄, 자기장', hint: '가까이 가져가고, 꾹 눌러보세요' },
+  { id: 'pendulum', name: '펜듈럼 종', latin: 'Pendulum wave', verb: '맞물리기', caption: 'No.05 — 크롬강 16구, D 음계', hint: '끌어당겼다 놓아보세요' },
 ];
 
 const $ = id => document.getElementById(id);

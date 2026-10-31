@@ -16,7 +16,7 @@ void main(){ vec2 p=(v-.5)*asp;
 const PUSH = /* glsl */ `in vec2 v; out vec4 o; uniform sampler2D h; uniform vec2 asp,c,dir; uniform float W,ds;
 void main(){ vec2 p=(v-.5)*asp; vec2 n=vec2(-dir.y,dir.x); vec2 rel=p-c; float s=dot(rel,n),f=dot(rel,dir);
   vec4 cur=texture(h,v);
-  float inW=smoothstep(W,W*.965,abs(s));
+  float inW=smoothstep(W,W*.88,abs(s));
   if(inW<=0.){ o=cur; return; }
   const float R=.05;
   // Strip just passed by the blade is scraped bare; its load lands ahead of the blade.
@@ -48,7 +48,7 @@ void main(){
   vec3 Nb=normalize(vec3((vnoise(p*3.+seedB)-.5)*.012,(vnoise(p*3.+seedB+5.)-.5)*.012,1.));
   vec3 Ny=vec3(Nb.x,Nb.z,-Nb.y); vec3 R=normalize(reflect(vec3(0.,-1.,0.),Ny)+vec3(p.x*1.25-.65,0.,-p.y*1.25-.4));
   // A soft window and gradient lie in the polish, so bare stone reads as mirror, not as a hole.
-  float win=smoothstep(.75,-.45,p.x*.7+p.y)*.075+.008;
+  float win=smoothstep(.75,-.45,p.x*.7+p.y)*.032+.005;
   vec3 bed=vec3(win*.94,win*.97,win);
   bed*=mix(.6,1.,sh);
   float gl=exp(-pow((p.x+p.y*.4-gleamX)*5.,2.)); bed+=vec3(1.,.96,.88)*gl*.42;
@@ -116,17 +116,27 @@ export function create(env) {
     const k = 1 - Math.exp(-dt * (26 - Math.min(15, load * 13))), mv = d * k;
     if (blade.fresh) { if (d < .012) return 0; blade.dx = dx / d; blade.dy = dy / d; blade.fresh = false; }
     if (d > 1e-4) {
-      const tt = 1 - Math.exp(-dt * 11);
-      blade.dx += (dx / d - blade.dx) * tt; blade.dy += (dy / d - blade.dy) * tt;
-      const l = Math.hypot(blade.dx, blade.dy) || 1; blade.dx /= l; blade.dy /= l;
-      const steps = Math.min(5, Math.ceil(mv / .011)), ds = mv / Math.max(steps, 1);
+      // A wide plow has to be turned before it can push the new way, so it pivots in place first.
+      const along0 = (dx * blade.dx + dy * blade.dy) / d;
+      if (along0 < .75) {
+        const tt = 1 - Math.exp(-dt * 20);
+        blade.dx += (dx / d - blade.dx) * tt; blade.dy += (dy / d - blade.dy) * tt;
+        const l = Math.hypot(blade.dx, blade.dy) || 1; blade.dx /= l; blade.dy /= l;
+        return 0;
+      }
+      const reach = Math.min(mv, .09), steps = Math.max(1, Math.ceil(reach / .009)), ds = reach / steps;
+      const tt = 1 - Math.exp(-dt * 6 / steps);
       for (let i = 0; i < steps; i++) {
+        // Turn a little on every step: turning between frames would leave a fan of ridges.
+        blade.dx += (dx / d - blade.dx) * tt; blade.dy += (dy / d - blade.dy) * tt;
+        const l = Math.hypot(blade.dx, blade.dy) || 1; blade.dx /= l; blade.dy /= l;
         blade.x += dx / d * ds; blade.y += dy / d * ds;
-        kit.draw(pP, { h: sim.read, asp, c: [blade.x, blade.y], dir: [blade.dx, blade.dy], W: bw(), ds }, sim.write); sim.swap();
+        const along = (dx * blade.dx + dy * blade.dy) / d;
+        kit.draw(pP, { h: sim.read, asp, c: [blade.x, blade.y], dir: [blade.dx, blade.dy], W: bw(), ds: ds * along }, sim.write); sim.swap();
       }
       relaxN = 22;
     }
-    const v = mv / Math.max(dt, .001);
+    const v = Math.min(mv, .09) / Math.max(dt, .001);
     speedS += (Math.min(1, v / 1.2) - speedS) * Math.min(1, dt * 30);
     load = Math.min(1.1, load + v * dt * .62);
     return v;
@@ -157,7 +167,7 @@ export function create(env) {
     frame(t, dt) {
       if (grow < 1.2) { grow += dt * .9; kit.draw(pI, { asp, seed: seedG, pal, h: sim.read, grow }, sim.write); sim.swap(); relaxN = 20; }
       const v = push(dt);
-      for (let i = 0; i < (relaxN > 0 ? 2 : 0); i++) { kit.draw(pR, { h: sim.read, tx: [1 / sim.w, 1 / sim.h], asp }, sim.write); sim.swap(); }
+      for (let i = 0; i < (relaxN > 0 ? 3 : 0); i++) { kit.draw(pR, { h: sim.read, tx: [1 / sim.w, 1 / sim.h], asp }, sim.write); sim.swap(); }
       relaxN--;
       load *= Math.exp(-dt * (blade.on ? .28 : 1.4));
 

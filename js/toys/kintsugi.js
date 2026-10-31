@@ -38,7 +38,7 @@ const SHADOW = /* glsl */ `in vec2 q; in float e; out vec4 o; uniform float alph
 void main(){ o=vec4(0.,0.,0.,alpha*smoothstep(0.,.06,e)); }`;
 
 const PLATE = /* glsl */ `in vec2 q; in float e; out vec4 o;
-uniform sampler2D albedoT,detailT; uniform vec2 rot,lightP; uniform float seedG,lift;
+uniform sampler2D albedoT,detailT; uniform vec2 rot,lightP; uniform float seedG,lift,bevel;
 float prof(float r){ // Shallow plate cross-section
   float well=smoothstep(.56,.84,r)*.16; float rim=smoothstep(.9,.985,r)*.05-smoothstep(.975,1.,r)*.09; return well+rim+.012*sin(r*30.)*smoothstep(.55,.8,r)*.25; }
 void main(){
@@ -60,7 +60,8 @@ void main(){
   float F=schlick(Ny.y,.055);
   col=col*(1.-F)+studio(R)*F*1.15;
   // Fracture bevel exposes raw stoneware.
-  float edge=1.-smoothstep(.0,.045,e);
+  // Raw fracture faces only show on loose shards; a seated shard closes the joint.
+  float edge=(1.-smoothstep(.0,.045,e))*bevel;
   if(edge>0.){ float gr=det.b*.5+.5; vec3 clay=vec3(.56,.44,.33)*gr; float ln=.55+.55*dot(normalize(vec3(rot.x,1.,rot.y)),L); col=mix(col,clay*ln*(vec3(1.,.93,.83)),edge); }
   col*=1.+lift*.1;
   o=vec4(col,1.);
@@ -386,7 +387,7 @@ export function create(env) {
       gl.disable(gl.BLEND);
       for (const f of sorted) {
         if (!f.placed) continue;
-        kit.use(pPlate, { ...plUni.u, scale, offset: [0, 0], rot: [R, 0], grow: 0 });
+        kit.use(pPlate, { ...plUni.u, bevel: 0, scale, offset: [0, 0], rot: [R, 0], grow: 0 });
         gl.drawArrays(gl.TRIANGLES, f.start, f.count);
       }
       // Seams between placed neighbours.
@@ -405,7 +406,7 @@ export function create(env) {
           gl.enable(gl.BLEND);
           drawShard(f, shUni);
           gl.disable(gl.BLEND);
-          drawShard(f, { p: pPlate, u: { ...plUni.u, lift: f.lift } });
+          drawShard(f, { p: pPlate, u: { ...plUni.u, bevel: 1, lift: f.lift } });
         }
       }
       gl.disable(gl.BLEND);

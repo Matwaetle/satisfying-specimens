@@ -194,13 +194,13 @@ function route() {
   if (spec) {
     document.body.classList.add('in-toy');
     $('index').hidden = true; $('shell').hidden = false;
-    document.title = `${spec.name} · 손맛`;
+    document.title = `${spec.name} · This too shall pass.`;
     canvas.classList.add('unfocused');
     setTimeout(() => mount(spec, false), reduced ? 0 : 180);
   } else {
     document.body.classList.remove('in-toy');
     $('index').hidden = false; $('shell').hidden = true;
-    document.title = '손맛';
+    document.title = 'This too shall pass.';
     list.classList.remove('has-active');
     list.querySelectorAll('a').forEach(x => x.classList.remove('active'));
     canvas.classList.add('unfocused');

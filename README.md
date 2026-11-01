@@ -1,4 +1,4 @@
-# 손맛 · This too shall pass.
+# This too shall pass.
 
 소리와 함께 즐기는 스트레스 해소용 정적 웹사이트입니다. 이미지와 음원 파일 없이 화면은 WebGL2, 소리는 Web Audio로 전부 실시간 생성합니다.
 

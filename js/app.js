@@ -120,7 +120,7 @@ function shellActions(inst) {
   $('actions').replaceChildren();
   const a = ensureAudio();
   const mute = button($('actions'), a.muted ? '소리 꺼짐' : '소리 켜짐', () => { a.setMuted(!a.muted); mute.textContent = a.muted ? '소리 꺼짐' : '소리 켜짐'; });
-  if (inst.reset) button($('actions'), '새 표본', () => { a.resume(); inst.reset(); });
+  if (inst.reset) button($('actions'), '새로 하기', () => { a.resume(); inst.reset(); });
 }
 
 // --- Mount / unmount ---------------------------------------------------------
@@ -194,13 +194,13 @@ function route() {
   if (spec) {
     document.body.classList.add('in-toy');
     $('index').hidden = true; $('shell').hidden = false;
-    document.title = `${spec.name} · 쾌감 표본실`;
+    document.title = `${spec.name} · 손맛`;
     canvas.classList.add('unfocused');
     setTimeout(() => mount(spec, false), reduced ? 0 : 180);
   } else {
     document.body.classList.remove('in-toy');
     $('index').hidden = false; $('shell').hidden = true;
-    document.title = '쾌감 표본실';
+    document.title = '손맛';
     list.classList.remove('has-active');
     list.querySelectorAll('a').forEach(x => x.classList.remove('active'));
     canvas.classList.add('unfocused');

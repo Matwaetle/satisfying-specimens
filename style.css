@@ -16,7 +16,7 @@ body.in-toy #scrim{opacity:0}
 #index[hidden],#shell[hidden],#nogl[hidden]{display:none}
 header{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:clamp(20px,5vh,56px)}
 h1{font-weight:300;font-size:clamp(20px,2.2vw,28px);letter-spacing:-.01em}
-.sub{font-family:var(--serif);font-style:italic;color:var(--dim);font-size:clamp(14px,1.3vw,17px)}
+.sub{font-family:var(--serif);font-style:italic;opacity:.88;font-size:clamp(17px,1.9vw,25px)}
 #list{list-style:none;padding:0;flex:1;display:flex;flex-direction:column;justify-content:center}
 #list li{border-top:1px solid var(--hair)}
 #list li:last-child{border-bottom:1px solid var(--hair)}

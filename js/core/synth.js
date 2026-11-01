@@ -323,6 +323,89 @@ export function squeakLoop(sr, seed = 2, dur = 2, rate = 240) {
   return normalize(x, .8);
 }
 
+// One sequin flipping over: a thin plastic disc ticking against its neighbour.
+export function sequinTick(sr, seed = 1) {
+  const r = rng(seed), f0 = 2900 + r() * 2700;
+  const modes = [[1, 1, .03], [1.64 + r() * .2, .6, .022], [2.7 + r() * .3, .3, .012]].map(([q, a, t]) => ({ f: f0 * q, a, t60: t }));
+  modes.push({ f: 1100 + r() * 500, a: .4, t60: .018 });
+  return modal(sr, modes, { dur: .05, contact: .5, contactMs: .25, contactFc: 8000, seed, peak: .85 });
+}
+
+// Small steel balls meeting: hard contact, a very short high ring, a little body.
+export function ballClick(sr, seed = 1, { size = 1 } = {}) {
+  const r = rng(seed), f0 = (3300 + r() * 2600) / size;
+  const modes = [[1, 1, .05], [1.51 + r() * .1, .7, .04], [2.42 + r() * .2, .4, .022], [3.6 + r() * .3, .18, .012]].map(([q, a, t]) => ({ f: f0 * q, a, t60: t * size }));
+  modes.push({ f: 900 / size, a: .35, t60: .016 });
+  return modal(sr, modes, { dur: .11, contact: .8, contactMs: .18, contactFc: 10000, seed, peak: .85 });
+}
+
+// Tacky wet paint letting go of the roller nap: thousands of tiny rising pops over a soft body.
+export function tackLoop(sr, seed = 3, dur = 3) {
+  const r = rng(seed), n = Math.floor(sr * (dur + .09)), x = brownLoopRaw(n, r, .93);
+  for (let k = 0; k < 2400 * dur; k++) {
+    const at = Math.floor(r() * n), f0 = 700 + Math.pow(r(), 1.7) * 3600, T = sr * (.0005 + r() * .0016), amp = Math.pow(r(), 2.2);
+    let p = 0;
+    for (let i = 0; i < T * 5 && at + i < n; i++) { p += TAU * f0 * (1 + .9 * i / (T * 5)) / sr; x[at + i] += Math.sin(p) * amp * Math.exp(-i / T) * .55; }
+  }
+  let m = 0; for (let i = 0; i < n; i++) m += x[i]; m /= n;
+  for (let i = 0; i < n; i++) x[i] -= m;
+  return normalize(loopify(x, sr), .8);
+}
+
+// Thick syrup falling in a rope: a dark bed with slow glugs, each carrying an upper partial for small speakers.
+export function pourLoop(sr, seed = 5, dur = 6) {
+  const r = rng(seed), n = Math.floor(sr * (dur + .09)), x = brownLoopRaw(n, r, .955);
+  for (let k = 0; k < 7 * dur; k++) {
+    const at = Math.floor(r() * (n - sr * .4)), f = 150 + r() * 330, g = .3 + r() * .4;
+    mixInto(x, bubble(sr, f, { rise: .45, tau: .035 + r() * .04, seed: seed + k, impact: 0 }), at, g);
+    mixInto(x, bubble(sr, f * 3.05, { rise: .55, tau: .016 + r() * .012, seed: seed + k + 90, impact: 0 }), at, g * .5);
+  }
+  return normalize(loopify(x, sr), .8);
+}
+
+// Adhesive releasing: stick-slip crackle in irregular runs.
+export function peelLoop(sr, seed = 6, dur = 3) {
+  const r = rng(seed), n = Math.floor(sr * (dur + .09)), x = new Float32Array(n);
+  for (let k = 0; k < 4200 * dur; k++) {
+    const at = Math.floor(r() * n), run = .5 + .5 * Math.sin(at / sr * 19 + 3 * Math.sin(at / sr * 5.3));
+    const amp = Math.pow(r(), 3) * (.2 + .8 * run * run), fc = 1400 + Math.pow(r(), 1.4) * 6800, T = sr * (.00012 + r() * .00045);
+    let p = r() * 6;
+    for (let i = 0; i < T * 5 && at + i < n; i++) { p += TAU * fc / sr; x[at + i] += Math.sin(p) * amp * Math.exp(-i / T); }
+  }
+  return normalize(loopify(x, sr), .8);
+}
+
+// Masking tape coming away in one long pull: a rising tear that ends in a flick.
+export function tapeRip(sr, seed = 7, dur = 1.1) {
+  const r = rng(seed), n = Math.floor(sr * dur), x = new Float32Array(n);
+  for (let k = 0; k < 6500 * dur; k++) {
+    const u = r(), at = Math.floor(u * n * .94), env = Math.min(1, u / .05) * (.45 + .55 * u);
+    const amp = Math.pow(r(), 2.6) * env, fc = 1500 + u * 2200 + r() * 5000, T = sr * (.00015 + r() * .0005);
+    let p = r() * 6;
+    for (let i = 0; i < T * 5 && at + i < n; i++) { p += TAU * fc / sr; x[at + i] += Math.sin(p) * amp * Math.exp(-i / T); }
+  }
+  return fadeEdges(normalize(x, .85), sr, 2, 25);
+}
+
+// Mains-driven clipper: a whole number of 120 Hz cycles, formants from the housing, a gated blade rattle.
+export function clipperLoop(sr, seed = 8, dur = 2) {
+  const r = rng(seed), n = Math.floor(sr * dur), x = new Float32Array(n), f0 = 120;
+  for (let k = 1; k <= 38; k++) {
+    const f = f0 * k; if (f > sr * .45) break;
+    const form = 1 + 2.6 * Math.exp(-Math.pow((f - 760) / 240, 2)) + 1.5 * Math.exp(-Math.pow((f - 2500) / 520, 2));
+    const a = form / Math.pow(k, .95), w = TAU * f / sr, ph = r() * 6;
+    for (let i = 0; i < n; i++) x[i] += Math.sin(w * i + ph) * a;
+  }
+  let m = 0; for (let i = 0; i < n; i++) m = Math.max(m, Math.abs(x[i]));
+  let lp = 0; const a = onePole(5200)(sr), edge = Math.floor(sr * .02);
+  for (let i = 0; i < n; i++) {
+    lp += a * ((r() * 2 - 1) - lp);
+    const gate = Math.pow(.5 + .5 * Math.cos(TAU * f0 * i / sr), 6), seam = Math.min(1, Math.min(i, n - 1 - i) / edge);
+    x[i] += lp * gate * m * .55 * seam;
+  }
+  return normalize(x, .8);
+}
+
 // Bright, soft two-note confirmation when a surface comes up perfectly clean.
 export function gleam(sr, seed = 1) {
   const x = new Float32Array(Math.floor(sr * 3));

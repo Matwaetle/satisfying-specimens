@@ -9,9 +9,15 @@ export const SPECIMENS = [
   { id: 'chocolate', name: '초콜릿', latin: 'Couverture', verb: '쪼개기', caption: 'No.02 — 카카오 70%, 녹은 속', hint: '한 칸씩 누르거나 쭉 그어보세요' },
   { id: 'sweep', name: '싹 밀기', latin: 'Sweep', verb: '밀어내기', caption: 'No.03 — 색모래, 흑요석 바닥', hint: '끝까지 쭉 밀어보세요' },
   { id: 'squeegee', name: '스퀴지', latin: 'Squeegee', verb: '닦아내기', caption: 'No.04 — 비누 거품과 고무날', hint: '쭉 닦아서 밤을 드러내보세요' },
-  { id: 'marble', name: '마블링', latin: 'Ebru', verb: '섞기', caption: 'No.05 — 수면 위의 안료', hint: '톡 떨어뜨리고, 끌어서 흐트러뜨리세요' },
-  { id: 'ferro', name: '페로플루이드', latin: 'Ferrofluid', verb: '끌어올리기', caption: 'No.06 — 기름 속의 Fe₃O₄, 자기장', hint: '가까이 가져가고, 꾹 눌러보세요' },
-  { id: 'pendulum', name: '펜듈럼 종', latin: 'Pendulum wave', verb: '맞물리기', caption: 'No.07 — 크롬강 16구, D 음계', hint: '끌어당겼다 놓아보세요' },
+  { id: 'sequin', name: '스팽글 천', latin: 'Sequin cloth', verb: '뒤집기', caption: 'No.05 — 양면 스팽글, 숨은 그림', hint: '위로 쓸면 그림이, 아래로 쓸면 은빛이 나와요' },
+  { id: 'magnet', name: '자석 쇠구슬', latin: 'Steel shot', verb: '끌어모으기', caption: 'No.06 — 크롬강 구슬, 네오디뮴 자석', hint: '꾹 눌러 모으고, 놓아보세요' },
+  { id: 'roller', name: '페인트 롤러', latin: 'Paint roller', verb: '칠하기', caption: 'No.07 — 무광 수성 페인트, 마스킹 테이프', hint: '벽을 다 칠하면 테이프가 떨어져요' },
+  { id: 'glaze', name: '글레이즈', latin: 'Mirror glaze', verb: '붓기', caption: 'No.08 — 거울 글레이즈, 버터크림', hint: '꾹 눌러 케이크 위에 부어보세요' },
+  { id: 'peel', name: '보호필름', latin: 'Protective film', verb: '벗기기', caption: 'No.09 — 공장 출고 필름, 손대지 않은 표면', hint: '모서리부터 안쪽으로 천천히 당겨보세요' },
+  { id: 'fur', name: '털 밀기', latin: 'Clipper', verb: '깎기', caption: 'No.10 — 긴 털과 바리캉', hint: '쭉 밀어서 줄을 내보세요' },
+  { id: 'marble', name: '마블링', latin: 'Ebru', verb: '섞기', caption: 'No.11 — 수면 위의 안료', hint: '톡 떨어뜨리고, 끌어서 흐트러뜨리세요' },
+  { id: 'ferro', name: '페로플루이드', latin: 'Ferrofluid', verb: '끌어올리기', caption: 'No.12 — 기름 속의 Fe₃O₄, 자기장', hint: '가까이 가져가고, 꾹 눌러보세요' },
+  { id: 'pendulum', name: '펜듈럼 종', latin: 'Pendulum wave', verb: '맞물리기', caption: 'No.13 — 크롬강 16구, D 음계', hint: '끌어당겼다 놓아보세요' },
 ];
 
 const $ = id => document.getElementById(id);

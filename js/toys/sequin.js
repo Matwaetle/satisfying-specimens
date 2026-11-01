@@ -41,7 +41,7 @@ void main(){
       vec3 alb=sB>.5?picture(ctr)*1.25:mix(vec3(.82,.8,.76),vec3(.9,.8,.62),hash(id+2.)*.45);
       float hole=smoothstep(.1,.16,length(q-vec2(0.,R*.72))/R);
       float L=max(dot(N,normalize(vec3(-.25,.45,.85))),0.);
-      vec3 sc=alb*alb*(.46+.7*L*L)+alb*env*.15;
+      vec3 sc=alb*alb*(.5+.7*L*L)+alb*min(env,vec3(6.))*.035;
       sc+=env*.015+vec3(1.,.95,.86)*pow(L,70.)*(.2+1.2*step(.93,hash(id)));
       sc*=mix(.72,1.,smoothstep(.5,-.3,q.y/R))*hole;
       // Light running through the cloth when the picture completes.

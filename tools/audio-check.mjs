@@ -29,6 +29,7 @@ const items = {
   'bell low': S.bell(sr, S.dScale(1, 293.66), { seed: 2 }), 'bell top': S.bell(sr, S.dScale(16, 293.66), { seed: 3 }),
   'glass rain': S.glassRain(sr, 2), 'pane break': S.paneBreak(sr, 2), 'ice hit': S.iceBoom(sr, 2, { power: .4 }), 'ice big': S.iceBoom(sr, 3, { power: 1.3 }), 'choc snap': S.chocSnap(sr, 2), 'slump': S.slump(sr, 2), 'squeak (loop)': S.squeakLoop(sr), 'gleam': S.gleam(sr, 2),
   'sequin tick': S.sequinTick(sr, 3), 'ball click': S.ballClick(sr, 3), 'tape rip': S.tapeRip(sr, 3), 'tack (loop)': S.tackLoop(sr), 'pour (loop)': S.pourLoop(sr), 'peel (loop)': S.peelLoop(sr), 'clipper (loop)': S.clipperLoop(sr),
+  'bubble (loop)': S.bubbleLoop(sr), 'whale call': S.whaleCall(sr), 'breach splash': S.breachSplash(sr), 'jaw thud': S.jawThud(sr),
   'water drop': S.waterDrop(sr, 3), 'gloop': S.gloop(sr, 4), 'wet tick': S.wetTick(sr, 4),
   'sand grains (loop)': S.sandGrains(sr, 1), 'brown (loop)': S.brownLoop(sr), 'water (loop)': S.waterLoop(sr), 'drone (loop)': S.drone(sr),
 };
@@ -51,7 +52,7 @@ const specs = Array.from({ length: 24 }, (_, i) => S.pop(sr, { size: 1, seed: i 
 const cents = specs.map(x => measure(x).centroid);
 console.log('pop centroid range', Math.min(...cents).toFixed(0), '-', Math.max(...cents).toFixed(0));
 // Loop seam: first and last samples must join without a jump.
-for (const k of ['sand grains (loop)', 'brown (loop)', 'water (loop)', 'drone (loop)', 'tack (loop)', 'pour (loop)', 'peel (loop)', 'clipper (loop)']) { const x = items[k]; console.log(k, 'seam jump', Math.abs(x[0] - x[x.length - 1]).toFixed(4)); }
+for (const k of ['sand grains (loop)', 'brown (loop)', 'water (loop)', 'drone (loop)', 'tack (loop)', 'pour (loop)', 'peel (loop)', 'clipper (loop)', 'bubble (loop)']) { const x = items[k]; console.log(k, 'seam jump', Math.abs(x[0] - x[x.length - 1]).toFixed(4)); }
 // Worst-case bell pile-up before the mastering chain: all 16 together at play gain.
 const mix = new Float32Array(sr * 3);
 for (let i = 0; i < 16; i++) { const b = S.bell(sr, S.dScale(i + 1, 293.66), { seed: 200 + i }); const g = .5 * .3 * .9; for (let j = 0; j < mix.length && j < b.length; j++) mix[j + 0] += b[j] * g; }

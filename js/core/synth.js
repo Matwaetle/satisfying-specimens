@@ -406,6 +406,60 @@ export function clipperLoop(sr, seed = 8, dur = 2) {
   return normalize(x, .8);
 }
 
+// A wall of rising air: dense small bubbles over a soft bed, thinning and bunching in waves.
+export function bubbleLoop(sr, seed = 9, dur = 4) {
+  const r = rng(seed), n = Math.floor(sr * (dur + .09)), x = brownLoopRaw(n, r, .94);
+  for (let i = 0; i < n; i++) x[i] *= .35;
+  for (let k = 0; k < 62 * dur; k++) {
+    const at = Math.floor(r() * (n - sr * .2)), f = 420 + Math.pow(r(), 1.6) * 1900, g = .12 + Math.pow(r(), 2) * .6;
+    mixInto(x, bubble(sr, f, { rise: 1 + r() * 1.5, tau: .012 + r() * .022, seed: seed + k, impact: .03 }), at, g);
+  }
+  return normalize(loopify(x, sr), .8);
+}
+
+// Humpback call: a slow scoop up and a fall, with enough upper harmonics to carry on small speakers.
+export function whaleCall(sr, seed = 10, dur = 2.8) {
+  const r = rng(seed), n = Math.floor(sr * dur), x = new Float32Array(n), base = 150 + r() * 25;
+  const parts = [[1, 1], [2, .62], [3, .4], [4, .26], [6, .12]];
+  let ph = 0, lp = 0; const a = onePole(1500)(sr);
+  for (let i = 0; i < n; i++) {
+    const t = i / sr, u = t / dur;
+    const glide = 1 + 1.15 * Math.sin(Math.min(1, u / .62) * Math.PI * .5) - .55 * Math.pow(Math.max(0, (u - .55) / .45), 1.5);
+    ph += TAU * base * glide * (1 + .012 * Math.sin(TAU * 5.2 * t) * Math.min(1, t * 2)) / sr;
+    let s = 0; for (const [q, g] of parts) s += Math.sin(ph * q + q) * g;
+    lp += a * ((r() * 2 - 1) - lp);
+    x[i] = (s + lp * .14) * Math.min(1, t / .28) * Math.pow(Math.max(0, 1 - u), .7);
+  }
+  return fadeEdges(normalize(x, .8), sr, 1, 60);
+}
+
+// The surface breaking: a chest thump, a falling roar of water and a long rain of droplets.
+export function breachSplash(sr, seed = 11, dur = 3) {
+  const r = rng(seed), n = Math.floor(sr * dur), x = new Float32Array(n);
+  let ph = 0;
+  for (let i = 0; i < sr * .7; i++) { const t = i / sr; ph += TAU * (62 + 58 * Math.exp(-t * 16)) / sr; x[i] += (Math.sin(ph) + .55 * Math.sin(2 * ph) + .42 * Math.sin(3 * ph) + .28 * Math.sin(5 * ph)) * Math.exp(-t * 6.5) * .95; }
+  let lp = 0;
+  for (let i = 0; i < n; i++) { const t = i / sr, a = onePole(500 + 5200 * Math.exp(-t * 2.4))(sr); lp += a * ((r() * 2 - 1) - lp); x[i] += lp * Math.min(1, t / .012) * Math.exp(-t * 2.1) * 1.05; }
+  for (let k = 0; k < 2400; k++) {
+    const u = Math.pow(r(), 1.5), at = Math.floor((.04 + u * .94) * n), amp = Math.exp(-u * 3.4) * Math.pow(r(), 2.2) * .5, f = 600 + r() * 3000, T = sr * (.0006 + r() * .004);
+    let p = r() * 6;
+    for (let i = 0; i < T * 5 && at + i < n; i++) { p += TAU * f * (1 + i / sr * 16) / sr; x[at + i] += Math.sin(p) * amp * Math.exp(-i / T); }
+  }
+  return fadeEdges(normalize(x, .95), sr, .1, 60);
+}
+
+// The jaw coming shut on a mouthful of water: heavy thud, then the gulp.
+export function jawThud(sr, seed = 12) {
+  const x = new Float32Array(Math.floor(sr * 1.5));
+  let ph = 0;
+  for (let i = 0; i < sr * .5; i++) { const t = i / sr; ph += TAU * (70 + 62 * Math.exp(-t * 26)) / sr; x[i] += (Math.sin(ph) + .6 * Math.sin(2 * ph) + .46 * Math.sin(3 * ph) + .3 * Math.sin(4 * ph)) * Math.exp(-t * 11); }
+  mixInto(x, gloop(sr, seed, { base: 130, count: 6, span: .6 }), Math.floor(sr * .09), .95);
+  // Water squeezed out through the baleen, so the shut still reads on a phone speaker.
+  const r = rng(seed + 3); let hp = 0, lp = 0;
+  for (let i = 0; i < sr * .7; i++) { const t = i / sr, n = r() * 2 - 1; hp += .12 * (n - hp); lp += .5 * (n - hp - lp); x[i] += lp * Math.min(1, t / .02) * Math.exp(-t * 5.5) * 1.1; }
+  return fadeEdges(normalize(x, .92), sr, .1, 40);
+}
+
 // Bright, soft two-note confirmation when a surface comes up perfectly clean.
 export function gleam(sr, seed = 1) {
   const x = new Float32Array(Math.floor(sr * 3));

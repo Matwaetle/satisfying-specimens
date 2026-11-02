@@ -18,6 +18,7 @@ export const SPECIMENS = [
   { id: 'marble', name: '마블링', latin: 'Ebru', verb: '섞기', caption: 'No.11 — 수면 위의 안료', hint: '톡 떨어뜨리고, 끌어서 흐트러뜨리세요' },
   { id: 'ferro', name: '페로플루이드', latin: 'Ferrofluid', verb: '끌어올리기', caption: 'No.12 — 기름 속의 Fe₃O₄, 자기장', hint: '가까이 가져가고, 꾹 눌러보세요' },
   { id: 'pendulum', name: '펜듈럼 종', latin: 'Pendulum wave', verb: '맞물리기', caption: 'No.13 — 크롬강 16구, D 음계', hint: '끌어당겼다 놓아보세요' },
+  { id: 'hunt', name: '고래 사냥', latin: 'Bubble net', verb: '사냥하기', caption: 'No.14 — 혹등고래의 거품 그물, 정어리 떼', hint: '꾹 누른 채 물고기 떼를 크게 한 바퀴 둘러보세요' },
 ];
 
 const $ = id => document.getElementById(id);
